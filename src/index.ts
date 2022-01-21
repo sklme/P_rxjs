@@ -1,2 +1,1 @@
-import log from "./util/log.js";
-log();
+import './obeservables/index.js';
