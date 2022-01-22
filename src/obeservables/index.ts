@@ -68,22 +68,23 @@ import { Observable, Subscriber } from 'rxjs';
   });
 })();
 
-// (() => {
-//   // Disposing Obervable Executions
-//   const subscribe = function (subscriber: Subscriber<string>) {
-//     const intervalId = setInterval(() => {
-//       subscriber.next('hi');
-//     }, 1000);
+(() => {
+  // Disposing Obervable Executions
+  const subscribe = function (subscriber: Subscriber<string>) {
+    const intervalId = setInterval(() => {
+      subscriber.next('hi');
+    }, 1000);
 
-//     return function unsubscribe() {
-//       clearInterval(intervalId);
-//     };
-//   };
+    return function unsubscribe() {
+      console.log('Disposing the Execution');
+      clearInterval(intervalId);
+    };
+  };
 
-//   const observable = new Observable<string>(subscribe);
+  const observable = new Observable<string>(subscribe);
 
-//   const subscription = observable.subscribe((x) => console.log(x));
-//   setTimeout(() => {
-//     subscription.unsubscribe();
-//   }, 3000);
-// })();
+  const subscription = observable.subscribe((x) => console.log(x));
+  setTimeout(() => {
+    subscription.unsubscribe();
+  }, 3000);
+})();
