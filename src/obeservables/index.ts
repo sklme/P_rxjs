@@ -37,12 +37,17 @@ import { Observable, Subscriber } from 'rxjs';
     subscriber.next(1);
     subscriber.next(2);
     subscriber.next(3);
-    subscriber.complete();
-    subscriber.next(4); // not reached
+
+    setTimeout(() => {
+      subscriber.next(4);
+      subscriber.complete();
+      subscriber.next(5); // not reached
+    }, 10);
   });
 
   observable1.subscribe((x) => console.log(`next and complete`, x));
-
+  console.log(12);
+  observable1.subscribe((x) => console.log(`other next and complete`, x));
   // next and error
   const observable2 = new Observable<number>(function subscribe(subscriber) {
     //
@@ -63,22 +68,22 @@ import { Observable, Subscriber } from 'rxjs';
   });
 })();
 
-(() => {
-  // Disposing Obervable Executions
-  const subscribe = function (subscriber: Subscriber<string>) {
-    const intervalId = setInterval(() => {
-      subscriber.next('hi');
-    }, 1000);
+// (() => {
+//   // Disposing Obervable Executions
+//   const subscribe = function (subscriber: Subscriber<string>) {
+//     const intervalId = setInterval(() => {
+//       subscriber.next('hi');
+//     }, 1000);
 
-    return function unsubscribe() {
-      clearInterval(intervalId);
-    };
-  };
+//     return function unsubscribe() {
+//       clearInterval(intervalId);
+//     };
+//   };
 
-  const observable = new Observable<string>(subscribe);
+//   const observable = new Observable<string>(subscribe);
 
-  const subscription = observable.subscribe((x) => console.log(x));
-  setTimeout(() => {
-    subscription.unsubscribe();
-  }, 3000);
-})();
+//   const subscription = observable.subscribe((x) => console.log(x));
+//   setTimeout(() => {
+//     subscription.unsubscribe();
+//   }, 3000);
+// })();
