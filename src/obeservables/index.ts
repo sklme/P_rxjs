@@ -1,4 +1,4 @@
-import { from, Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
 // 第一个例子
 (function () {
@@ -63,11 +63,22 @@ import { from, Observable } from 'rxjs';
   });
 })();
 
-// (() => {
-//   // Disposing Obervable Executions
-//   const observable = from([10, 20, 30]);
-//   const subscription = observable.subscribe((x) =>
-//     console.log('Disposing Obervable Executions', x),
-//   );
-//   subscription.unsubscribe();
-// })();
+(() => {
+  // Disposing Obervable Executions
+  const subscribe = function (subscriber: Subscriber<string>) {
+    const intervalId = setInterval(() => {
+      subscriber.next('hi');
+    }, 1000);
+
+    return function unsubscribe() {
+      clearInterval(intervalId);
+    };
+  };
+
+  const observable = new Observable<string>(subscribe);
+
+  const subscription = observable.subscribe((x) => console.log(x));
+  setTimeout(() => {
+    subscription.unsubscribe();
+  }, 3000);
+})();
