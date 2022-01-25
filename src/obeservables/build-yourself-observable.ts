@@ -52,6 +52,24 @@ class SafeSubscriber<T> {
 }
 
 /**
+ * A class to wrap our function, to ensure that when the function is
+ * called with an observer, that observer is wrapped with a SafeSubscriber
+ */
+class Observable<T> {
+  constructor(
+    private _wrappedFunction: (subscriber: SafeSubscriber<T>) => void,
+  ) {}
+
+  subscribe(observer: Observer<T>): void {
+    // We can wrap our observer in a "safe subscriber" that
+    // does the work of making sure it's not closed.
+    const subscriber = new SafeSubscriber(observer);
+    // 执行
+    this._wrappedFunction(subscriber);
+  }
+}
+
+/**
  * 一个最简单的rxjs模型
  */
 (() => {
@@ -111,24 +129,6 @@ class SafeSubscriber<T> {
  * 也避免暴露了SafeSubscriber
  */
 (() => {
-  /**
-   * A class to wrap our function, to ensure that when the function is
-   * called with an observer, that observer is wrapped with a SafeSubscriber
-   */
-  class Observable<T> {
-    constructor(
-      private _wrappedFunction: (subscriber: SafeSubscriber<T>) => void,
-    ) {}
-
-    subscribe(observer: Observer<T>): void {
-      // We can wrap our observer in a "safe subscriber" that
-      // does the work of making sure it's not closed.
-      const subscriber = new SafeSubscriber(observer);
-      // 执行
-      this._wrappedFunction(subscriber);
-    }
-  }
-
   // usage
   console.log('----------------');
   console.log('start with safe subscriber and wrapped Observable class');
@@ -147,6 +147,138 @@ class SafeSubscriber<T> {
   console.log('----------------');
 })();
 
-// (() => {
-//   //
-// })();
+/**
+ * 提供一个可以取消订阅的能力
+ * 先在我们最
+ * 最简单的取消函数
+ */
+(() => {
+  const source = (subscriber: Observer<number>) => {
+    const timer = (() => {
+      let i = 0;
+      return setInterval(() => {
+        subscriber.next?.(i++);
+      }, 1000);
+    })();
+
+    return () => clearInterval(timer);
+  };
+
+  const teardown = source({
+    next: console.log,
+  });
+
+  setTimeout(() => {
+    console.log('取消订阅（simple）');
+    teardown();
+  }, 5000);
+})();
+
+/**
+ * 引入Subscription来处理取消订阅的能力
+ * 就是我们最终的版本
+ */
+(() => {
+  class Subscription {
+    private teardowns = new Set<() => void>();
+
+    add(teardown: () => void) {
+      this.teardowns.add(teardown);
+    }
+
+    unsubscribe() {
+      console.log('teardowns size', this.teardowns.size);
+      for (const teardown of this.teardowns) {
+        teardown();
+      }
+
+      this.teardowns.clear();
+    }
+  }
+
+  class SafeSubscriber<T> {
+    // 是否已经调用complete或者error
+    closed = false;
+
+    constructor(
+      private destination: Observer<T>,
+      private subscription: Subscription,
+    ) {
+      // Make sure that if the subscription is unsubscribed,
+      // we don't let any more notifications through this subscriber.
+      this.subscription.add(() => (this.closed = true));
+    }
+
+    #closeSubcription() {
+      this.closed = true;
+    }
+
+    next(value: T) {
+      // Check to see if this is "closed" before nexting.
+      if (!this.closed) {
+        this.destination.next?.(value);
+      }
+    }
+
+    complete() {
+      // Make sure we're not completing an already "closed" subscriber.
+      if (!this.closed) {
+        // We're closed now
+        this.#closeSubcription();
+        // send compete signal
+        this.destination.complete?.();
+        this.subscription.unsubscribe();
+      }
+    }
+
+    error(err: unknown) {
+      if (!this.closed) {
+        this.#closeSubcription();
+        this.destination.error?.(err);
+        this.subscription.unsubscribe();
+      }
+    }
+  }
+
+  /**
+   * A class to wrap our function, to ensure that when the function is
+   * called with an observer, that observer is wrapped with a SafeSubscriber
+   */
+  class Observable<T> {
+    constructor(
+      private _wrappedFunction: (subscriber: SafeSubscriber<T>) => () => void,
+    ) {}
+
+    subscribe(observer: Observer<T>): Subscription {
+      // We can wrap our observer in a "safe subscriber" that
+      // does the work of making sure it's not closed.
+      const subscription = new Subscription();
+      const subscriber = new SafeSubscriber(observer, subscription);
+      subscription.add(this._wrappedFunction(subscriber));
+      return subscription;
+    }
+  }
+
+  // Usage
+  const observable = new Observable((subscriber) => {
+    const timer = (() => {
+      let i = 0;
+      return setInterval(() => {
+        subscriber.next(i++);
+      }, 1000);
+    })();
+
+    return () => clearInterval(timer);
+  });
+
+  const subscription = observable.subscribe({
+    next(n) {
+      console.log('最终的版本的返回值', n);
+    },
+  });
+
+  setTimeout(() => {
+    console.log('取消订阅了最终版本');
+    subscription.unsubscribe();
+  }, 5500);
+})();
