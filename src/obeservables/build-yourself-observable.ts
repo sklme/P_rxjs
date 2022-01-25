@@ -3,9 +3,10 @@
 /**
  * A simple object with a `next` and `complete` callback on it.
  */
-interface Observer<T = any> {
-  next(value: T): void;
-  complete(): void;
+interface Observer<T = unknown> {
+  next?: (value: T) => void;
+  complete?: () => void;
+  error?: (err: unknown) => void;
 }
 
 /**
@@ -28,7 +29,7 @@ class SafeSubscriber<T> {
   next(value: T) {
     // Check to see if this is "closed" before nexting.
     if (!this.closed) {
-      this.destination.next(value);
+      this.destination.next?.(value);
     }
   }
 
@@ -38,7 +39,14 @@ class SafeSubscriber<T> {
       // We're closed now
       this.#closeSubcription();
       // send compete signal
-      this.destination.complete();
+      this.destination.complete?.();
+    }
+  }
+
+  error(err: unknown) {
+    if (!this.closed) {
+      this.#closeSubcription();
+      this.destination.error?.(err);
     }
   }
 }
@@ -51,8 +59,8 @@ class SafeSubscriber<T> {
    * A function that takes a simple object with callbacks
    * and does something them.
    */
-  const source = (subscriber: Observer<number>) => {
-    subscriber.next(1);
+  const source = (subscriber: Required<Observer<number>>) => {
+    subscriber.next?.(1);
     subscriber.next(2);
     subscriber.next(3);
     subscriber.complete();
@@ -64,6 +72,7 @@ class SafeSubscriber<T> {
   source({
     next: console.log,
     complete: () => console.log('done!'),
+    error: (err) => console.log(err),
   });
   console.log('stop');
 })();
@@ -107,7 +116,9 @@ class SafeSubscriber<T> {
    * called with an observer, that observer is wrapped with a SafeSubscriber
    */
   class Observable<T> {
-    constructor(private _wrappedFunction: (subscriber: Observer<T>) => void) {}
+    constructor(
+      private _wrappedFunction: (subscriber: SafeSubscriber<T>) => void,
+    ) {}
 
     subscribe(observer: Observer<T>): void {
       // We can wrap our observer in a "safe subscriber" that
@@ -135,3 +146,7 @@ class SafeSubscriber<T> {
   console.log('start with safe subscriber and wrapped Observable class');
   console.log('----------------');
 })();
+
+// (() => {
+//   //
+// })();
