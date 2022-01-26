@@ -19,4 +19,6 @@
 // bindCallback
 // import './operators/creationOperators/bindCallback';
 // buildNodeCallback
-import './operators/creationOperators/bindNodeCallback';
+// import './operators/creationOperators/bindNodeCallback';
+// defer
+import './operators/creationOperators/defer';
