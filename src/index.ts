@@ -10,7 +10,11 @@
  * operators
  */
 // import './operators/basic.js';
+
 /**
  * creation operators
  */
-import './operators/creationOperators.js';
+// ajax
+// import './operators/creationOperators/ajax.js';
+// bindCallback
+import './operators/creationOperators/bindCallback';

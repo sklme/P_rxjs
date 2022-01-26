@@ -2,8 +2,9 @@
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

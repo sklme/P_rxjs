@@ -2,7 +2,7 @@
   "name": "@iskl/p_rxjs",
   "author": "wrynn",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "version": "1.0.0",
   "description": "",
   "scripts": {

@@ -1,39 +1,11 @@
-import {
-  asapScheduler,
-  asyncScheduler,
-  bindCallback,
-  catchError,
-  map,
-  of,
-} from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-
-function makeTitle(str: string) {
-  console.log();
-  console.log(`---------- ${str} ----------`);
-}
-
-// ajax
-// only work in browser
-(() => {
-  //
-  // ajax(`https://api.github.com/users?per_page=5`)
-  //   .pipe(
-  //     map((r) => console.log('users,', r)),
-  //     catchError((err) => {
-  //       console.log('error:', err);
-  //       return of(err);
-  //     }),
-  //   )
-  //   .subscribe((n) => {
-  //     console.log(n);
-  //   });
-})();
+// bindCallback
+import { asapScheduler, bindCallback } from 'rxjs';
+import { makeTitle } from '../../util/makeTitle';
 
 // bindCallback
 // Give it a function f of type f(x, callback) and it will return a function g that when called as g(x) will output an Observable.
 (() => {
-  console.log('---- bindCallback ----');
+  makeTitle('bindCallback');
   // 1.最基本的
   // 不传递任何参数
   const simpleFnWithCallback = function (cb: (n: unknown) => unknown) {
