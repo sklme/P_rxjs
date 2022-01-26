@@ -1,6 +1,6 @@
 import { readFile } from 'fs';
 import path from 'path';
-import { bindNodeCallback } from 'rxjs';
+import { bindNodeCallback, map, tap } from 'rxjs';
 import { makeTitle } from '../../util/makeTitle';
 
 /**
@@ -18,4 +18,14 @@ import { makeTitle } from '../../util/makeTitle';
   readFileAsObservable(filePath, {
     encoding: 'utf-8',
   }).subscribe(console.log);
+
+  // 2. self made func to wrap
+  function doubleFn(n: number, cb: (err: unknown, n: number) => void) {
+    cb(null, n * 2);
+  }
+
+  const doubleAsObservable = bindNodeCallback(doubleFn);
+  doubleAsObservable(20)
+    .pipe(map((x) => x + 2))
+    .subscribe(console.log);
 })();
