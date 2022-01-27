@@ -79,6 +79,12 @@ import { makeTitle } from '../util/makeTitle';
   console.log(f64a[2]); // 40
   console.log(f64a.byteLength); // 24
   console.log(f64a.length); // 3
+
+  makeTitle('使用其他视图示例构造');
+  const otherDataView = new Uint8Array([1, 11, 111, 222]);
+  console.log(otherDataView);
+  const thisDataView = new Int8Array(otherDataView);
+  console.log(thisDataView);
 })();
 
 //
