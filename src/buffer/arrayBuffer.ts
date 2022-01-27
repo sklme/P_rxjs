@@ -79,12 +79,20 @@ import { makeTitle } from '../util/makeTitle';
   console.log(f64a[2]); // 40
   console.log(f64a.byteLength); // 24
   console.log(f64a.length); // 3
+  const bigInt64 = new BigInt64Array([1n, 2n, 3n]);
+  console.log(BigInt64Array.BYTES_PER_ELEMENT); // 8
+  console.log(bigInt64); //
 
   makeTitle('使用其他视图示例构造');
   const otherDataView = new Uint8Array([1, 11, 111, 222]);
   console.log(otherDataView);
   const thisDataView = new Int8Array(otherDataView);
   console.log(thisDataView);
-})();
 
-//
+  makeTitle('视图的数组方法');
+  makeTitle('普通数组的操作方法和属性，对TypedArray数组完全适用。');
+  const u32 = new Uint32Array([1, 2, 3, 4]);
+  console.log(u32.slice(1));
+
+  makeTitle('字节序');
+})();
