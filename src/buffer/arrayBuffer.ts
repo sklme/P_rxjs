@@ -152,4 +152,52 @@ import { makeTitle } from '../util/makeTitle';
   console.log('string 2 ab, ', stringArrayBuf);
   const str = ab2str(stringArrayBuf);
   console.log('ab 2 string, ', str);
+
+  makeTitle('实例属性方法');
+  // buffer， 返回该TypedArray的arrayBuffer
+  const a = new Float32Array(1);
+  const b = new Uint8Array(a.buffer);
+  console.log(b);
+
+  // length and byteLength
+  const aa = new Int16Array(8);
+  console.log(aa.length); // 8
+  console.log(aa.byteLength); // 16
+
+  // set 用于复制数组
+  const a1 = new Uint8Array([1, 2, 3]);
+  console.log(a1); // 1,2,3
+  const a2 = new Uint8Array(3);
+  console.log(a2); // 0 0 0
+  a2.set(a1);
+  console.log(a2); // 1,2,3
+  const a3 = new Uint8Array(4);
+  console.log(a3); // 0 ,0
+  a3.set(a1, 1);
+  console.log(a3); // 0,1,2,3
+
+  // subarray 创建新的视图， 注意是基于同一个arrayBuffer
+  // 如果用slice，就不会是基于通一个arrayBuffer，而是创建一个新的
+  const buf2 = new ArrayBuffer(8);
+  const u16 = new Uint16Array(buf2);
+  const u16_sub = u16.subarray(0, 2);
+  const u16_slice = u16.slice(0, 2);
+  console.log(u16); // 0 0 0 0
+  console.log(u16_sub); // 0 0
+  console.log(u16_slice); // 0 0
+  u16[0] = 1;
+  console.log(u16); // 1 0 0 0
+  console.log(u16_sub); // 1 0
+  console.log(u16_slice); // 0 0
+
+  makeTitle('静态属性和方法');
+  // of
+  const x = Float32Array.of(0.151, -8, 3.7);
+  console.log(x);
+  // from
+  const x2 = Int8Array.from([1, 2, 3]);
+  console.log(x2);
 })();
+
+// 复合视图
+(() => {})();
