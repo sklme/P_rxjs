@@ -200,4 +200,20 @@ import { makeTitle } from '../util/makeTitle';
 })();
 
 // 复合视图
-(() => {})();
+(() => {
+  // 符合视图
+  const buf = new ArrayBuffer(24); // 24位
+  // 用buf的1-4位 创建一个Uint32Array视图
+  const idView = new Uint32Array(buf, 0, 1);
+  console.log(idView);
+  // buf的5-20位创建一个Uint8Array视图
+  const usernameView = new Uint8Array(buf, 4, 16);
+  console.log(usernameView);
+  // buf的21-24位创建一个Float32Array视图
+  const amountDueView = new Float32Array(buf, 20, 1);
+  console.log(amountDueView);
+  idView[0] = 1;
+  usernameView[0] = 1;
+  amountDueView[0] = 1;
+  console.log(buf);
+})();
