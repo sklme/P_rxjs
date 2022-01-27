@@ -1,6 +1,12 @@
 // import './obeservables/index.js';
 
 /**
+ * 对于buffer的学习
+ */
+// arrayBuffer
+import './buffer/arrayBuffer';
+
+/**
  * observavle的学习，建立一个简单版本的observable
  * 来源：https://benlesh.com/posts/learning-observable-by-building-observable/
  * */
@@ -25,4 +31,4 @@
 // empty
 // import './operators/creationOperators/empty';
 // from
-import './operators/creationOperators/from';
+// import './operators/creationOperators/from';
