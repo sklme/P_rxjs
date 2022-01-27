@@ -119,4 +119,37 @@ import { makeTitle } from '../util/makeTitle';
   }
   const endian = getPlatformEndianness();
   console.log('这个运行环境的字节序是', endian);
+
+  // 与字符串转换
+  makeTitle('TypeeArray与字符串转换');
+  // ArrayBuffer转为字符串，或者字符串转为ArrayBuffer，有一个前提，即字符串的编码方法是确定的。假定字符串采用UTF-16编码（JavaScript的内部编码方式），可以自己编写转换函数。s
+  function str2ab(str: string) {
+    const buf = new ArrayBuffer(str.length * 2); // 每个字符占用2个字节
+    const bufView = new Uint16Array(buf);
+    return Array.prototype.reduce.call<
+      string,
+      [
+        (result: Uint16Array, current: string, index: number) => Uint16Array,
+        Uint16Array,
+      ],
+      Uint16Array
+    >(
+      str,
+      (result, current: string, index) => {
+        // TODO 怎么处理unicde？charPointAt？
+        const charCode = current.charCodeAt(0);
+        result[index] = charCode;
+        return result;
+      },
+      bufView,
+    );
+  }
+
+  function ab2str(ab: Uint16Array) {
+    return String.fromCharCode.apply(null, [...ab]);
+  }
+  const stringArrayBuf = str2ab('我最厉害123');
+  console.log('string 2 ab, ', stringArrayBuf);
+  const str = ab2str(stringArrayBuf);
+  console.log('ab 2 string, ', str);
 })();
