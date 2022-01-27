@@ -94,5 +94,29 @@ import { makeTitle } from '../util/makeTitle';
   const u32 = new Uint32Array([1, 2, 3, 4]);
   console.log(u32.slice(1));
 
-  makeTitle('字节序');
+  makeTitle('判断字节序');
+  const BIG_ENDIAN = Symbol('BIG_ENDIAN');
+  const LITTLE_ENDIAN = Symbol('LITTLE_ENDIAN');
+  const UNKNOWN_ENDIAN = Symbol('UNKNOWN_ENDIAN');
+  function getPlatformEndianness() {
+    // 创建一个32位的typeArray，作为内存来对比
+    const arr32 = Uint32Array.of(0x12345678);
+    // 创建一个8位的typeArray，从内存中取出数字来判断
+    const arr8 = new Uint8Array(arr32.buffer);
+    switch (
+      arr8[0] * 0x1000000 +
+      arr8[1] * 0x10000 +
+      arr8[2] * 0x100 +
+      arr8[3]
+    ) {
+      case 0x78563412:
+        return LITTLE_ENDIAN;
+      case 0x12345678:
+        return BIG_ENDIAN;
+      default:
+        return UNKNOWN_ENDIAN;
+    }
+  }
+  const endian = getPlatformEndianness();
+  console.log('这个运行环境的字节序是', endian);
 })();
