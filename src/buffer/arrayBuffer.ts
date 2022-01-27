@@ -217,3 +217,23 @@ import { makeTitle } from '../util/makeTitle';
   amountDueView[0] = 1;
   console.log(buf);
 })();
+
+// dataView 视图
+(() => {
+  makeTitle('dataView 视图');
+  // 构造函数
+  const buf = new ArrayBuffer(16);
+  const dv = new DataView(buf);
+
+  // 读取内存
+  // 读取最后4个字节
+  console.log(dv.getInt32(12));
+  // 读取最开始的两个字节
+  console.log(dv.getInt16(0));
+
+  // 写入内存
+  dv.setInt32(0, 16, true);
+  console.log(dv.getInt32(0, true));
+  console.log(buf);
+  console.log(new Int32Array(buf));
+})();
